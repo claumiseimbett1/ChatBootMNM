@@ -11,31 +11,40 @@ from langchain_community.vectorstores import FAISS
 import os
 import pickle
 import json
+import hashlib
+from datetime import datetime
+try:
+    import redis
+    REDIS_AVAILABLE = True
+except ImportError:
+    REDIS_AVAILABLE = False
 
 @st.cache_resource
 def load_llama_model():
-    """Carga el modelo Llama con optimizaciones"""
+    """Carga el modelo con optimizaciones"""
     try:
-        model_name = "meta-llama/Llama-3.2-3B-Instruct"
+        # Usar modelo más compatible y liviano
+        model_name = "microsoft/DialoGPT-small"  # Más liviano y estable
+        
+        print(f"📥 Descargando modelo: {model_name}")
         
         # Cargar tokenizer
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        tokenizer.pad_token = tokenizer.eos_token
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
         
-        # Configurar argumentos del modelo
+        # Configurar argumentos del modelo - sin device_map para mayor compatibilidad
         model_kwargs = {
-            "device_map": "auto",
-            "torch_dtype": torch.float16,
-            "trust_remote_code": True
+            "torch_dtype": torch.float32,  # Cambiar a float32 para mayor compatibilidad
         }
-        
-        # Quantización deshabilitada para Windows
         
         # Cargar modelo
         model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
         
+        print("✅ Modelo cargado exitosamente")
         return model, tokenizer
     except Exception as e:
+        print(f"❌ Error cargando el modelo: {str(e)}")
         st.error(f"Error cargando el modelo: {str(e)}")
         return None, None
 
@@ -108,6 +117,94 @@ def identify_doc_type(filename):
     else:
         return "general"
 
+class RedisCache:
+    """Maneja el cache de respuestas con Redis"""
+    def __init__(self):
+        self.redis_client = None
+        self.cache_available = False
+        self._connect()
+    
+    def _connect(self):
+        """Conecta a Redis con fallback"""
+        if not REDIS_AVAILABLE:
+            print("⚠️ Módulo redis no instalado - cache deshabilitado")
+            self.cache_available = False
+            return
+            
+        try:
+            # Intentar conexión local primero
+            self.redis_client = redis.Redis(
+                host='localhost', 
+                port=6379, 
+                db=0, 
+                decode_responses=True,
+                socket_connect_timeout=2,
+                socket_timeout=2
+            )
+            # Probar conexión
+            self.redis_client.ping()
+            self.cache_available = True
+            print("✅ Redis conectado exitosamente")
+        except Exception as e:
+            print(f"⚠️ Redis no disponible: {e}")
+            self.cache_available = False
+    
+    def _generate_key(self, user_input):
+        """Genera clave única para el cache"""
+        normalized_input = user_input.lower().strip()
+        return f"chatbot_response:{hashlib.md5(normalized_input.encode()).hexdigest()}"
+    
+    def get_response(self, user_input):
+        """Obtiene respuesta del cache"""
+        if not self.cache_available:
+            return None
+        
+        try:
+            key = self._generate_key(user_input)
+            cached_data = self.redis_client.get(key)
+            if cached_data:
+                response_data = json.loads(cached_data)
+                print(f"🔄 Cache HIT para: {user_input[:50]}...")
+                return response_data['response']
+        except Exception as e:
+            print(f"Error obteniendo del cache: {e}")
+        
+        return None
+    
+    def set_response(self, user_input, response, ttl=3600):
+        """Guarda respuesta en cache (TTL: 1 hora por defecto)"""
+        if not self.cache_available:
+            return False
+        
+        try:
+            key = self._generate_key(user_input)
+            response_data = {
+                'response': response,
+                'timestamp': datetime.now().isoformat(),
+                'input': user_input
+            }
+            self.redis_client.setex(key, ttl, json.dumps(response_data))
+            print(f"💾 Cache SAVE para: {user_input[:50]}...")
+            return True
+        except Exception as e:
+            print(f"Error guardando en cache: {e}")
+            return False
+    
+    def clear_cache(self):
+        """Limpia todo el cache del chatbot"""
+        if not self.cache_available:
+            return False
+        
+        try:
+            keys = self.redis_client.keys("chatbot_response:*")
+            if keys:
+                self.redis_client.delete(*keys)
+                print(f"🗑️ Cache limpiado: {len(keys)} entradas eliminadas")
+            return True
+        except Exception as e:
+            print(f"Error limpiando cache: {e}")
+            return False
+
 class LlamaSwimmingBot:
     def __init__(self):
         self.model = None
@@ -115,18 +212,26 @@ class LlamaSwimmingBot:
         self.vectorstore = None
         self.embeddings = None
         self.conversation_history = []
+        self.cache = RedisCache()
     
     def search_documents(self, query, k=2):
         """Busca en los documentos PDF"""
-        if not self.vectorstore:
+        try:
+            if not self.vectorstore:
+                print("⚠️ No hay vectorstore disponible")
+                return ""
+            
+            print(f"🔍 Buscando: {query}")
+            docs = self.vectorstore.similarity_search(query, k=k)
+            context = ""
+            for doc in docs:
+                context += f"\n[{doc.metadata.get('doc_type', 'documento')}]: {doc.page_content}\n"
+            
+            print(f"📄 Documentos encontrados: {len(docs)}")
+            return context
+        except Exception as e:
+            print(f"❌ Error en búsqueda de documentos: {e}")
             return ""
-        
-        docs = self.vectorstore.similarity_search(query, k=k)
-        context = ""
-        for doc in docs:
-            context += f"\n[{doc.metadata.get('doc_type', 'documento')}]: {doc.page_content}\n"
-        
-        return context
     
     def get_enrollment_flow(self, step=1):
         """Maneja el flujo de inscripción paso a paso"""
@@ -157,29 +262,30 @@ Es un deporte de bajo impacto, ideal para la salud.
 🟠 Después de la segunda clase: 50%
 🔴 Después de la tercera clase: No hay devolución
 
-5️⃣ **Política de reposición**
-Puedes consultarla aquí:
-📎 https://bit.ly/32J20r0
-
-6️⃣ **Importante sobre el uso de la piscina**
+5️⃣ **Importante sobre el uso de la piscina**
 La piscina es pública. El aporte mensual garantiza instructores calificados, no es el alquiler del espacio.
 
-7️⃣ **¿Qué riesgos debo tener en cuenta?**
+6️⃣ **¿Qué riesgos debo tener en cuenta?**
 • Lesiones menores, ahogamiento, contacto con otros usuarios, clima
 • Declaras estar en condiciones óptimas de salud
 • Si representas a un menor, también asumes responsabilidad por él/ella
 
-📸 **¿Se toman fotos o videos?**
+7️⃣ **¿Se toman fotos o videos?**
 Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar los términos.
 
-✍️ **¿Deseas continuar con tu inscripción?**
+8️⃣ **¿Deseas continuar con tu inscripción?**
 
 ✅ **Sí, quiero inscribirme**
 ❌ **No, volver al inicio**
 📩 **Contactar asesor humano para solicitar la documentación**
 
-📞 WhatsApp: +57 3144809367
-👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)"""
+9️⃣ **¿Tienes dudas sobre nuestra política de reposición de clases?**
+📋 Pregúntame específicamente sobre "política de reposición" o "reponer clases" para obtener información detallada.
+
+📞 **WhatsApp:** +57 3144809367
+📧 **Email:** monteriamaster@gmail.com
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
         }
         
         return enrollment_steps.get(step, "Paso no válido")
@@ -209,10 +315,12 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 • 4:00 PM a 5:00 PM
 • 5:00 PM a 6:00 PM
 
-📞 Para más información: +57 3144809367
+📞 **WhatsApp:** +57 3144809367
+📧 **Email:** monteriamaster@gmail.com
 
 🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
-👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)"""
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
             
             elif any(word in user_lower for word in ["adulto", "mayor"]):
                 return """🏊‍♂️ **HORARIOS PARA ADULTOS:**
@@ -232,10 +340,12 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 **Miércoles y Viernes:**
 • 6:00 PM a 7:00 PM
 
-📞 Para más información: +57 3144809367
+📞 **WhatsApp:** +57 3144809367
+📧 **Email:** monteriamaster@gmail.com
 
 🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
-👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)"""
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
             
             else:
                 return """📅 **HORARIOS COMPLETOS - CLUB DE NATACIÓN MNM:**
@@ -271,10 +381,12 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 
 📝 **Inscripción:** $40,000 (pago único)
 
-📞 WhatsApp: +57 3144809367
+📞 **WhatsApp:** +57 3144809367
+📧 **Email:** monteriamaster@gmail.com
 
 🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
-👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)"""
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
         
         elif any(word in user_lower for word in ["traer", "necesito", "llevar", "primera clase", "equipamiento"]):
             return """🎒 **QUÉ TRAER A TU PRIMERA CLASE:**
@@ -290,10 +402,12 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 
 👶 **Edades:** Desde 5 años sin límite superior
 
-📞 WhatsApp: +57 3144809367
+📞 **WhatsApp:** +57 3144809367
+📧 **Email:** monteriamaster@gmail.com
 
 🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
-👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)"""
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
         
         elif any(word in user_lower for word in ["enfasis", "énfasis", "enfoque", "que enseñan", "metodologia", "metodología", "escuela", "enseñanza", "sistema", "niveles", "como enseñan", "que aprendo", "qué aprendo"]):
             return """🎯 **ÉNFASIS DE NUESTRA ESCUELA:**
@@ -309,22 +423,30 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 9. ⚡ Fomento de disciplina y trabajo en equipo
 10. 🌱 Promoción de estilo de vida saludable
 
-📞 WhatsApp: +57 3144809367
+📞 **WhatsApp:** +57 3144809367
+📧 **Email:** monteriamaster@gmail.com
 
 🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
-👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)"""
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
         
         elif any(word in user_lower for word in ["edad", "años", "niño", "menor"]):
-            return """👶 **EDADES ACEPTADAS:**
+            return """<div style="text-align: center;">
+
+👶 **EDADES ACEPTADAS:**
 
 ✅ Desde 5 años sin límite superior
 
 🏊‍♀️ Tenemos horarios especializados para niños y adultos, en grupos segmentados para facilitar y promover el aprendizaje
 
-📞 WhatsApp: +57 3144809367
+</div>
+
+📞 **WhatsApp:** +57 3144809367
+📧 **Email:** monteriamaster@gmail.com
 
 🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
-👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)"""
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
         
         elif any(word in user_lower for word in ["contacto", "teléfono", "telefono", "whatsapp", "direccion", "dirección", "ubicacion", "ubicación", "donde"]):
             return """📍 **INFORMACIÓN DE CONTACTO:**
@@ -333,8 +455,33 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 📍 Dirección: Piscina de la Villaolímpica, Montería
 📞 Teléfono: +57 3144809367
 💬 WhatsApp: +57 3144809367
+📧 Email: monteriamaster@gmail.com
 
 ¡Te esperamos! 🌊"""
+        
+        elif any(word in user_lower for word in ["reposicion", "reposición", "reponer", "recuperar clase", "faltar"]):
+            return """📋 **POLÍTICA DE REPOSICIÓN - MONTERÍA NATACIÓN MASTER**
+
+✅ Entendemos que a veces surgen imprevistos. Por eso, puedes reponer una (1) clase por mes, y evaluamos cada caso según la justificación que nos compartas.
+
+📅 Puedes tomar tu reposición en otro horario dentro del mismo mes, en grupos del mismo nivel y calendario, según disponibilidad de cupo. Si faltaste en la última semana del ciclo, ¡tranqui! tienes hasta 8 días del mes siguiente para recuperarla.
+
+🔁 Ten en cuenta que las reposiciones no se acumulan ni se trasladan a otros meses.
+
+🌧 Si la piscina se cierra por motivos externos, garantizamos las reposiciones que correspondan.
+
+❌ Para cuidar la organización de nuestros grupos y ofrecerte una buena experiencia, no reponemos clases sin aviso previo.
+
+📲 Escríbenos por WhatsApp oficial del club para gestionar tu reposición. ¡Estamos para ayudarte! 🏊‍♀️✨
+
+📎 **Documento completo:** https://bit.ly/32J20r0
+
+📞 **WhatsApp:** +57 3144809367
+📧 **Email:** monteriamaster@gmail.com
+
+🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
         
         elif any(word in user_lower for word in ["reglamento", "reglas", "normas", "politicas", "políticas", "terminos", "términos", "condiciones"]):
             return """📋 **INFORMACIÓN SOBRE REGLAMENTOS:**
@@ -368,20 +515,67 @@ WhatsApp: +57 3144809367
         return None
 
     def generate_response(self, user_input):
-        """Genera respuesta usando Llama + RAG con fallback"""
-        # Primero intentar respuesta de fallback
+        """Genera respuesta usando fallback primero, luego PDFs si es necesario"""
+        # DEBUG: Log de entrada
+        print(f"🔍 INPUT: {user_input}")
+        
+        # Intentar obtener respuesta del cache primero
+        cached_response = self.cache.get_response(user_input)
+        if cached_response:
+            print("📋 Usando respuesta del cache")
+            return cached_response
+        
+        # Primero intentar respuesta de fallback (respuestas hardcodeadas)
         fallback = self.get_fallback_response(user_input)
         if fallback:
+            print("✅ Respuesta hardcodeada encontrada")
+            # Guardar en cache con TTL largo para respuestas frecuentes
+            self.cache.set_response(user_input, fallback, ttl=7200)  # 2 horas
             return fallback
         
-        if not self.model or not self.tokenizer:
-            self.model, self.tokenizer = load_llama_model()
-            if self.model is None or self.tokenizer is None:
-                return "Lo siento, hay un problema con el sistema. Por favor contacta al personal del club."
-        
-        # Buscar contexto relevante
+        # Si no hay respuesta hardcodeada, buscar en PDFs
+        print("📚 No hay respuesta hardcodeada, buscando en PDFs...")
         document_context = self.search_documents(user_input)
+        print(f"📄 Contexto encontrado: {len(document_context) if document_context else 0} caracteres")
         
+        if document_context and len(document_context.strip()) > 50:
+            # Si encontramos contenido relevante en PDFs, devolver eso
+            pdf_response = f"""📋 **Información encontrada en documentos del club:**
+
+{document_context}
+
+📞 **WhatsApp:** +57 3144809367
+📧 **Email:** monteriamaster@gmail.com
+🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Consulta%20Club%20de%20Natación%20MNM)"""
+            
+            print("✅ Respuesta generada desde PDFs")
+            self.cache.set_response(user_input, pdf_response, ttl=3600)  # 1 hora
+            return pdf_response
+        
+        # Si no encontramos nada en PDFs, dar respuesta genérica
+        print("❌ No se encontró información específica")
+        generic_response = f"""🏊‍♀️ **Club de Natación Montería Natación Master**
+
+Lo siento, no tengo información específica sobre tu consulta en este momento.
+
+📞 Para información detallada contacta directamente:
+💬 WhatsApp: +57 3144809367
+📧 Email: monteriamaster@gmail.com
+📍 Piscina de la Villaolímpica, Montería
+
+🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
+👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Consulta%20Club%20de%20Natación%20MNM)
+
+¡Estaremos felices de ayudarte! 🌊"""
+        
+        self.cache.set_response(user_input, generic_response, ttl=1800)  # 30 minutos
+        return generic_response
+
+    def old_llama_method(self, user_input, document_context):
+        """Método anterior con Llama (mantenido por si se necesita)"""
         # Información base del club
         club_info = """
 CLUB DE NATACION MONTERIA NATACIÓN MASTER
@@ -430,23 +624,16 @@ QUÉ TRAER PRIMERA CLASE:
         # Historial de conversación
         conversation_context = "\n".join(self.conversation_history[-4:])
         
-        # Crear prompt simplificado
-        prompt = f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
-Eres un asistente del Club de Natación Monteria. Responde usando SOLO esta información:
+        # Crear prompt compatible con DialoGPT
+        prompt = f"""Club de Natación Monteria - Información disponible:
 
 {club_info}
 
 {document_context}
 
-Reglas:
-- Si la información está arriba, respóndela completa
-- No digas "contacta al club" si tienes la respuesta
-- Responde en español, amigable y directo<|eot_id|>
-
-<|start_header_id|>user<|end_header_id|>
-{user_input}<|eot_id|>
-
-<|start_header_id|>assistant<|end_header_id|>"""
+Conversación:
+Usuario: {user_input}
+Asistente:"""
 
         # Generar respuesta
         inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True, max_length=3072)
@@ -465,7 +652,7 @@ Reglas:
         
         # Decodificar respuesta
         full_response = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        response = full_response.split("assistant<|end_header_id|>")[-1].strip()
+        response = full_response.split("Asistente:")[-1].strip()
         
         # Filtrar respuestas problemáticas y usar fallback si es necesario
         problematic_phrases = [
@@ -490,6 +677,9 @@ Para información específica sobre tu consulta:
 
 ¡Estaremos felices de ayudarte! 🌊"""
         
+        # Guardar respuesta en cache con TTL menor para respuestas del modelo
+        self.cache.set_response(user_input, response, ttl=1800)  # 30 minutos
+        
         # Actualizar historial
         self.conversation_history.append(f"Usuario: {user_input}")
         self.conversation_history.append(f"Asistente: {response}")
@@ -499,7 +689,7 @@ Para información específica sobre tu consulta:
 # Aplicación Streamlit
 def main():
     st.set_page_config(
-        page_title="A",
+        page_title="CHATBOOTMNM",
         page_icon="🏊‍♀️",
         layout="wide"
     )
@@ -707,7 +897,7 @@ def main():
     with col_title:
         st.markdown("""
         <div class="header-container">
-            <h1 class="main-title">SwimIA - Asistente Virtual del Club Montería Natación Master (MNM)</h1>
+            <h1 class="main-title">SwimmIA - Asistente Virtual del Club Montería Natación Master (MNM)</h1>
         </div>
         """, unsafe_allow_html=True)
     
@@ -723,7 +913,7 @@ def main():
                 text-align: center;">
         <h3 style="color: #134492; margin-bottom: 15px; font-weight: bold;">¡Hola! Bienvenido al Club Montería Natación Master</h3>
         <p style="color: #495057; font-size: 16px; margin: 0; line-height: 1.5;">
-            Soy tu asistente virtual <strong>SwimIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. 
+            Soy tu asistente virtual <strong>SwimmIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. 
             <strong>¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
         </p>
     </div>
@@ -746,7 +936,7 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     
     with col1:
         if st.button("📅 Horarios del club"):
@@ -760,12 +950,12 @@ def main():
         if st.button("📅 Horarios del club para adultos"):
             user_input = "¿Cuáles son los horarios de adultos?"
             process_message(user_input)
-            
+    
+    with col2:
         if st.button("💰 Precios por frecuencia semanal"):
             user_input = "¿Cuáles son los precios del mes por frecuencia semanal?"
             process_message(user_input)
-    
-    with col2:
+            
         if st.button("🎯 Énfasis de nuestra Escuela de Natación"):
             user_input = "¿Cuál es el énfasis de la Escuela de Natación MNM?"
             process_message(user_input)
@@ -774,10 +964,15 @@ def main():
             user_input = "¿Cómo me inscribo?"
             process_message(user_input)
         
+    with col3:
         if st.button("🏊‍♂️ ¿Qué traer en la primera clase?"):
             user_input = "¿Qué debo traer a mi primera clase de natación?"
             process_message(user_input)
         
+        if st.button("📋 Política de reposición de clases"):
+            user_input = "política de reposición"
+            process_message(user_input)
+            
         if st.button("👶 Edades aceptadas"):
             user_input = "¿Desde qué edad aceptan niños?"
             process_message(user_input)
