@@ -1,7 +1,7 @@
 # swimming_club_bot.py
 import streamlit as st
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+#from transformers import AutoTokenizer, AutoModelForCausalLM
 # Deshabilitar quantización en Windows
 QUANTIZATION_AVAILABLE = False
 from langchain_community.document_loaders import PyPDFLoader
