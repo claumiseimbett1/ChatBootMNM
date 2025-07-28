@@ -821,6 +821,11 @@ def main():
         transition: all 0.3s ease;
     }
     
+    /* Placeholder text color */
+    .stTextInput > div > div > input::placeholder {
+        color: #666666 !important;
+    }
+    
     .stTextInput > div > div > input:focus {
         border-color: #1a3d70;
         box-shadow: 0 0 15px rgba(26, 61, 112, 0.3);
