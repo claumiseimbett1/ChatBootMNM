@@ -433,11 +433,11 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
         elif any(word in user_lower for word in ["edad", "años", "niño", "menor"]):
             return """<div style="text-align: center;">
 
-👶 **EDADES ACEPTADAS:**
+👶 **¡Qué maravilloso que quieras que tu familia forme parte de nosotros! - EDADES ACEPTADAS:**
 
 ✅ Desde 5 años sin límite superior
 
-🏊‍♀️ Tenemos horarios especializados para niños y adultos, en grupos segmentados para facilitar y promover el aprendizaje
+🏊‍♀️ Con mucho amor tenemos horarios especializados para niños y adultos, en grupos segmentados para facilitar y promover el aprendizaje en un ambiente cálido y familiar
 
 </div>
 
@@ -449,7 +449,7 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
         
         elif any(word in user_lower for word in ["contacto", "teléfono", "telefono", "whatsapp", "direccion", "dirección", "ubicacion", "ubicación", "donde"]):
-            return """📍 **INFORMACIÓN DE CONTACTO:**
+            return """📍 **¡Nos encantaría conocerte! - INFORMACIÓN DE CONTACTO:**
 
 🏊‍♀️ **Club de Natación Montería Natación Master**
 📍 Dirección: Piscina de la Villaolímpica, Montería
@@ -457,7 +457,7 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 💬 WhatsApp: +57 3144809367
 📧 Email: monteriamaster@gmail.com
 
-¡Te esperamos! 🌊"""
+¡Te esperamos con mucho cariño y entusiasmo! 🌊💙"""
         
         elif any(word in user_lower for word in ["reposicion", "reposición", "reponer", "recuperar clase", "faltar"]):
             return """📋 **POLÍTICA DE REPOSICIÓN - MONTERÍA NATACIÓN MASTER**
@@ -498,19 +498,19 @@ WhatsApp: +57 3144809367
 Tenemos documentación completa disponible."""
         
         elif any(word in user_lower for word in ["inscripcion", "inscripción", "matricula", "matrícula", "registro"]):
-            return """📝 **PROCESO DE INSCRIPCIÓN:**
+            return """📝 **¡Qué emoción que quieras ser parte de nuestra familia! - PROCESO DE INSCRIPCIÓN:**
 
 💰 **Costo de inscripción:** $40,000 (pago único)
 
-📋 Para completar tu inscripción necesitas:
+📋 Para completar tu inscripción con mucho gusto te ayudaremos con:
 • Documentación personal
 • Información médica básica
 • Selección de horarios
 
-📞 Para iniciar el proceso contactanos:
+📞 Para iniciar este maravilloso proceso, contáctanos:
 WhatsApp: +57 3144809367
 
-¡Te ayudaremos con todo el proceso, Bienvenido! 🏊‍♀️"""
+¡Te acompañaremos paso a paso con toda la dedicación del mundo! ¡Bienvenido a casa! 🏊‍♀️💙"""
         
         return None
 
@@ -540,15 +540,17 @@ WhatsApp: +57 3144809367
         
         if document_context and len(document_context.strip()) > 50:
             # Si encontramos contenido relevante en PDFs, devolver eso
-            pdf_response = f"""📋 **Información encontrada en documentos del club:**
+            pdf_response = f"""📋 **¡Qué bueno que preguntes! Aquí tienes la información que encontré en nuestros documentos:**
 
 {document_context}
 
 📞 **WhatsApp:** +57 3144809367
 📧 **Email:** monteriamaster@gmail.com
-🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
+🔥 **¡Nos encantaría que fueras parte de nuestra familia!**
 👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
-💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Consulta%20Club%20de%20Natación%20MNM)"""
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Consulta%20Club%20de%20Natación%20MNM)
+
+¡Esperamos conocerte pronto! 💙"""
             
             print("✅ Respuesta generada desde PDFs")
             self.cache.set_response(user_input, pdf_response, ttl=3600)  # 1 hora
@@ -556,20 +558,20 @@ WhatsApp: +57 3144809367
         
         # Si no encontramos nada en PDFs, dar respuesta genérica
         print("❌ No se encontró información específica")
-        generic_response = f"""🏊‍♀️ **Club de Natación Montería Natación Master**
+        generic_response = f"""🏊‍♀️ **¡Hola! Me da mucha alegría poder ayudarte en el Club de Natación Montería Natación Master**
 
-Lo siento, no tengo información específica sobre tu consulta en este momento.
+¡Qué emocionante que te intereses por la natación! 😊 Aunque no tengo información específica sobre tu consulta en este momento, estoy aquí para apoyarte en todo lo que necesites.
 
-📞 Para información detallada contacta directamente:
+📞 Para información detallada, estaré encantado de conectarte con nuestro equipo:
 💬 WhatsApp: +57 3144809367
 📧 Email: monteriamaster@gmail.com
 📍 Piscina de la Villaolímpica, Montería
 
-🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
+🔥 **¡Será un placer tenerte en nuestra familia acuática!**
 👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
 💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Consulta%20Club%20de%20Natación%20MNM)
 
-¡Estaremos felices de ayudarte! 🌊"""
+¡Te esperamos con los brazos abiertos y mucha calidez! 🌊💙"""
         
         self.cache.set_response(user_input, generic_response, ttl=1800)  # 30 minutos
         return generic_response
@@ -666,16 +668,16 @@ Asistente:"""
             if fallback_response:
                 response = fallback_response
             else:
-                response = f"""🏊‍♀️ **Club de Natación Montería Natación Master**
+                response = f"""🏊‍♀️ **¡Hola querido amigo! - Club de Natación Montería Natación Master**
 
-Para información específica sobre tu consulta:
+Para información específica sobre tu consulta, nuestro equipo estará encantado de atenderte:
 📞 WhatsApp: +57 3144809367
 📍 Piscina de la Villaolímpica, Montería
 
-🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
+🔥 **¡Será un honor tenerte en nuestra familia acuática!**
 👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
 
-¡Estaremos felices de ayudarte! 🌊"""
+¡Estaremos más que felices de recibirte con los brazos abiertos! 🌊💙"""
         
         # Guardar respuesta en cache con TTL menor para respuestas del modelo
         self.cache.set_response(user_input, response, ttl=1800)  # 30 minutos
@@ -926,7 +928,7 @@ def main():
                 max-width: 800px;
                 text-align: center;">
         <h3 style="color: #134492; margin-bottom: 15px; font-weight: bold;">¡Hola! Bienvenido al Club Montería Natación Master</h3>
-        <p style="color: #495057; font-size: 16px; margin: 0; line-height: 1.5;">
+        <p style="color: #134492; font-size: 16px; margin: 0; line-height: 1.5;">
             Soy tu asistente virtual <strong>SwimmIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. 
             <strong>¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
         </p>
