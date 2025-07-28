@@ -919,16 +919,16 @@ def main():
     
     # Mensaje de bienvenida
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+    <div style="background: linear-gradient(135deg, #134492 0%, #1a3d70 100%); 
                 padding: 20px; 
                 border-radius: 15px; 
                 margin: 20px auto; 
-                border-left: 5px solid #134492;
-                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+                border-left: 5px solid #dede3c;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
                 max-width: 800px;
                 text-align: center;">
-        <h3 style="color: #134492; margin-bottom: 15px; font-weight: bold;">¡Hola! Bienvenido al Club Montería Natación Master</h3>
-        <p style="color: #134492; font-size: 16px; margin: 0; line-height: 1.5;">
+        <h3 style="color: #ffffff; margin-bottom: 15px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">¡Hola! Bienvenido al Club Montería Natación Master</h3>
+        <p style="color: #ffffff; font-size: 16px; margin: 0; line-height: 1.5; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);">
             Soy tu asistente virtual <strong>SwimmIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. 
             <strong>¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
         </p>
