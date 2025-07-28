@@ -699,8 +699,14 @@ def main():
     <style>
     /* Configuración general */
     .stApp {
-        background-color: #ffffff;
+        background-color: #1e3a5f;
+        color: #ffffff;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    /* Forzar texto blanco en toda la aplicación */
+    .stApp * {
+        color: #ffffff !important;
     }
     
     /* Header con logo */
@@ -786,12 +792,20 @@ def main():
         border: 2px solid #134492;
     }
     
+    .user-message * {
+        color: #1a3d70 !important;
+    }
+    
     .bot-message {
         background: linear-gradient(135deg, #134492 0%, #1a3d70 100%);
         margin-right: 15%;
-        color: white !important;
+        color: #ffffff !important;
         box-shadow: 0 3px 10px rgba(19, 68, 146, 0.3);
         border: 2px solid #dede3c;
+    }
+    
+    .bot-message * {
+        color: #ffffff !important;
     }
     
     /* Input de texto */
@@ -800,7 +814,7 @@ def main():
         border: 2px solid #134492;
         padding: 12px 20px;
         background-color: #ffffff;
-        color: #134492;
+        color: #1a3d70 !important;
         font-size: 16px;
         transition: all 0.3s ease;
     }
@@ -832,8 +846,8 @@ def main():
     
     /* Título de secciones */
     .section-title {
-        color: #000000 !important;
-        background-color: rgba(255, 255, 255, 0.9);
+        color: #1a3d70 !important;
+        background-color: rgba(255, 255, 255, 0.95);
         font-size: 24px;
         font-weight: 900;
         margin-bottom: 15px;
@@ -932,7 +946,7 @@ def main():
     # Botones de consultas rápidas
     st.markdown("""
     <div class="frequent-queries">
-        <div class="section-title" style="color: #000000 !important; background: rgba(255,255,255,0.9); padding: 10px; border-radius: 10px; font-weight: bold; font-size: 24px;">Consultas Frecuentes</div>
+        <div class="section-title" style="color: #1a3d70 !important; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 10px; font-weight: bold; font-size: 24px;">Consultas Frecuentes</div>
     </div>
     """, unsafe_allow_html=True)
     
