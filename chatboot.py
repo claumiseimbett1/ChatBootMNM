@@ -934,7 +934,7 @@ def main():
                 text-align: center;">
         <h3 style="color: #ffffff; margin-bottom: 15px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">¡Hola! Bienvenido al Club Montería Natación Master</h3>
         <p style="color: #ffffff; font-size: 16px; margin: 0; line-height: 1.5; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);">
-            Soy tu asistente virtual <strong>NatalIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. 
+            Soy tu asistente virtual <strong>NatalIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. Estamos en Villaolimpica - Monteria
             <strong>¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
         </p>
     </div>
