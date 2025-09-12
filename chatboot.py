@@ -433,11 +433,11 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
         elif any(word in user_lower for word in ["edad", "años", "niño", "menor"]):
             return """<div style="text-align: center;">
 
-👶 **¡Qué maravilloso que quieras que tu familia forme parte de nosotros! - EDADES ACEPTADAS:**
+👶 **EDADES ACEPTADAS:**
 
 ✅ Desde 5 años sin límite superior
 
-🏊‍♀️ Con mucho amor tenemos horarios especializados para niños y adultos, en grupos segmentados para facilitar y promover el aprendizaje en un ambiente cálido y familiar
+🏊‍♀️ Tenemos horarios especializados para niños y adultos, en grupos segmentados para facilitar y promover el aprendizaje
 
 </div>
 
@@ -449,7 +449,7 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Inscripción%20Club%20de%20Natación%20MNM)"""
         
         elif any(word in user_lower for word in ["contacto", "teléfono", "telefono", "whatsapp", "direccion", "dirección", "ubicacion", "ubicación", "donde"]):
-            return """📍 **¡Nos encantaría conocerte! - INFORMACIÓN DE CONTACTO:**
+            return """📍 **INFORMACIÓN DE CONTACTO:**
 
 🏊‍♀️ **Club de Natación Montería Natación Master**
 📍 Dirección: Piscina de la Villaolímpica, Montería
@@ -457,7 +457,7 @@ Sí. Autorizas su uso con fines deportivos y promocionales del club al aceptar l
 💬 WhatsApp: +57 3144809367
 📧 Email: monteriamaster@gmail.com
 
-¡Te esperamos con mucho cariño y entusiasmo! 🌊💙"""
+¡Te esperamos! 🌊"""
         
         elif any(word in user_lower for word in ["reposicion", "reposición", "reponer", "recuperar clase", "faltar"]):
             return """📋 **POLÍTICA DE REPOSICIÓN - MONTERÍA NATACIÓN MASTER**
@@ -498,19 +498,19 @@ WhatsApp: +57 3144809367
 Tenemos documentación completa disponible."""
         
         elif any(word in user_lower for word in ["inscripcion", "inscripción", "matricula", "matrícula", "registro"]):
-            return """📝 **¡Qué emoción que quieras ser parte de nuestra familia! - PROCESO DE INSCRIPCIÓN:**
+            return """📝 **PROCESO DE INSCRIPCIÓN:**
 
 💰 **Costo de inscripción:** $40,000 (pago único)
 
-📋 Para completar tu inscripción con mucho gusto te ayudaremos con:
+📋 Para completar tu inscripción necesitas:
 • Documentación personal
 • Información médica básica
 • Selección de horarios
 
-📞 Para iniciar este maravilloso proceso, contáctanos:
+📞 Para iniciar el proceso contactanos:
 WhatsApp: +57 3144809367
 
-¡Te acompañaremos paso a paso con toda la dedicación del mundo! ¡Bienvenido a casa! 🏊‍♀️💙"""
+¡Te ayudaremos con todo el proceso, Bienvenido! 🏊‍♀️"""
         
         return None
 
@@ -540,17 +540,15 @@ WhatsApp: +57 3144809367
         
         if document_context and len(document_context.strip()) > 50:
             # Si encontramos contenido relevante en PDFs, devolver eso
-            pdf_response = f"""📋 **¡Qué bueno que preguntes! Aquí tienes la información que encontré en nuestros documentos:**
+            pdf_response = f"""📋 **Información encontrada en documentos del club:**
 
 {document_context}
 
 📞 **WhatsApp:** +57 3144809367
 📧 **Email:** monteriamaster@gmail.com
-🔥 **¡Nos encantaría que fueras parte de nuestra familia!**
+🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
 👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
-💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Consulta%20Club%20de%20Natación%20MNM)
-
-¡Esperamos conocerte pronto! 💙"""
+💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Consulta%20Club%20de%20Natación%20MNM)"""
             
             print("✅ Respuesta generada desde PDFs")
             self.cache.set_response(user_input, pdf_response, ttl=3600)  # 1 hora
@@ -558,20 +556,20 @@ WhatsApp: +57 3144809367
         
         # Si no encontramos nada en PDFs, dar respuesta genérica
         print("❌ No se encontró información específica")
-        generic_response = f"""🏊‍♀️ **¡Hola! Me da mucha alegría poder ayudarte en el Club de Natación Montería Natación Master**
+        generic_response = f"""🏊‍♀️ **Club de Natación Montería Natación Master**
 
-¡Qué emocionante que te intereses por la natación! 😊 Aunque no tengo información específica sobre tu consulta en este momento, estoy aquí para apoyarte en todo lo que necesites.
+Lo siento, no tengo información específica sobre tu consulta en este momento.
 
-📞 Para información detallada, estaré encantado de conectarte con nuestro equipo:
+📞 Para información detallada contacta directamente:
 💬 WhatsApp: +57 3144809367
 📧 Email: monteriamaster@gmail.com
 📍 Piscina de la Villaolímpica, Montería
 
-🔥 **¡Será un placer tenerte en nuestra familia acuática!**
+🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
 👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
 💌 [Enviar correo electrónico](mailto:monteriamaster@gmail.com?subject=Consulta%20Club%20de%20Natación%20MNM)
 
-¡Te esperamos con los brazos abiertos y mucha calidez! 🌊💙"""
+¡Estaremos felices de ayudarte! 🌊"""
         
         self.cache.set_response(user_input, generic_response, ttl=1800)  # 30 minutos
         return generic_response
@@ -668,16 +666,16 @@ Asistente:"""
             if fallback_response:
                 response = fallback_response
             else:
-                response = f"""🏊‍♀️ **¡Hola querido amigo! - Club de Natación Montería Natación Master**
+                response = f"""🏊‍♀️ **Club de Natación Montería Natación Master**
 
-Para información específica sobre tu consulta, nuestro equipo estará encantado de atenderte:
+Para información específica sobre tu consulta:
 📞 WhatsApp: +57 3144809367
 📍 Piscina de la Villaolímpica, Montería
 
-🔥 **¡Será un honor tenerte en nuestra familia acuática!**
+🔥 **¡REALIZA TU INSCRIPCIÓN YA!**
 👆 [Haz clic aquí para inscribirte por WhatsApp](https://wa.me/573144809367?text=Hola,%20quiero%20inscribirme%20en%20el%20Club%20de%20Natación%20MNM)
 
-¡Estaremos más que felices de recibirte con los brazos abiertos! 🌊💙"""
+¡Estaremos felices de ayudarte! 🌊"""
         
         # Guardar respuesta en cache con TTL menor para respuestas del modelo
         self.cache.set_response(user_input, response, ttl=1800)  # 30 minutos
@@ -821,11 +819,6 @@ def main():
         transition: all 0.3s ease;
     }
     
-    /* Placeholder text color */
-    .stTextInput > div > div > input::placeholder {
-        color: #666666 !important;
-    }
-    
     .stTextInput > div > div > input:focus {
         border-color: #1a3d70;
         box-shadow: 0 0 15px rgba(26, 61, 112, 0.3);
@@ -924,16 +917,16 @@ def main():
     
     # Mensaje de bienvenida
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #134492 0%, #1a3d70 100%); 
+    <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
                 padding: 20px; 
                 border-radius: 15px; 
                 margin: 20px auto; 
-                border-left: 5px solid #dede3c;
-                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+                border-left: 5px solid #134492;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
                 max-width: 800px;
                 text-align: center;">
-        <h3 style="color: #ffffff; margin-bottom: 15px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">¡Hola! Bienvenido al Club Montería Natación Master</h3>
-        <p style="color: #ffffff; font-size: 16px; margin: 0; line-height: 1.5; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);">
+        <h3 style="color: #134492; margin-bottom: 15px; font-weight: bold;">¡Hola! Bienvenido al Club Montería Natación Master</h3>
+        <p style="color: #495057; font-size: 16px; margin: 0; line-height: 1.5;">
             Soy tu asistente virtual <strong>SwimmIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. 
             <strong>¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
         </p>
