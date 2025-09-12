@@ -715,6 +715,11 @@ def main():
         color: #ffffff !important;
     }
     
+    /* Excepción para el mensaje de bienvenida */
+    .welcome-message * {
+        color: inherit !important;
+    }
+    
     /* Header con logo */
     .header-container {
         background: linear-gradient(135deg, #1a3d70 0%, #134492 100%);
@@ -1112,19 +1117,32 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-    # Mensaje de bienvenida optimizado para móvil
+    # Mensaje de bienvenida con máximo contraste
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #dede3c 0%, #f5f5a3 100%); 
-                padding: 15px; 
-                border-radius: 15px; 
-                margin: 15px 5px; 
-                border: 3px solid #134492;
-                box-shadow: 0 5px 15px rgba(19, 68, 146, 0.3);
-                text-align: center;">
-        <h3 style="color: #1a3d70; margin-bottom: 12px; font-weight: bold; font-size: clamp(18px, 4vw, 24px); text-shadow: 1px 1px 2px rgba(255,255,255,0.7);">¡Hola! Bienvenido al Club Montería Natación Master</h3>
-        <p style="color: #134492; font-size: clamp(14px, 3.5vw, 16px); margin: 0; line-height: 1.4; font-weight: 600;">
-            Soy tu asistente virtual <strong style="color: #1a3d70;">NatalIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. Estamos en Villaolimpica - Monteria.
-            <br><strong style="color: #1a3d70;">¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
+    <div class="welcome-message" style="background-color: #ffffff !important; 
+                padding: 20px !important; 
+                border-radius: 15px !important; 
+                margin: 20px 10px !important; 
+                border: 4px solid #134492 !important;
+                box-shadow: 0 8px 20px rgba(19, 68, 146, 0.4) !important;
+                text-align: center !important;
+                display: block !important;
+                width: calc(100% - 20px) !important;
+                box-sizing: border-box !important;">
+        <h2 style="color: #134492 !important; 
+                   margin-bottom: 15px !important; 
+                   font-weight: 900 !important; 
+                   font-size: 24px !important;
+                   text-shadow: none !important;
+                   line-height: 1.3 !important;">¡Hola! Bienvenido al Club Montería Natación Master</h2>
+        <p style="color: #1a3d70 !important; 
+                  font-size: 16px !important; 
+                  margin: 0 !important; 
+                  line-height: 1.5 !important; 
+                  font-weight: 600 !important;
+                  text-shadow: none !important;">
+            Soy tu asistente virtual <strong style="color: #134492 !important;">NatalIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. Estamos en Villaolimpica - Monteria.<br><br>
+            <strong style="color: #134492 !important;">¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
         </p>
     </div>
     """, unsafe_allow_html=True)
