@@ -691,10 +691,11 @@ def main():
     st.set_page_config(
         page_title="CHATBOOTMNM",
         page_icon="🏊‍♀️",
-        layout="wide"
+        layout="centered",
+        initial_sidebar_state="collapsed"
     )
     
-    # CSS personalizado completo
+    # CSS personalizado completo con optimización móvil
     st.markdown("""
     <style>
     /* Configuración general */
@@ -712,39 +713,40 @@ def main():
     /* Header con logo */
     .header-container {
         background: linear-gradient(135deg, #1a3d70 0%, #134492 100%);
-        padding: 20px;
+        padding: 15px;
         border-radius: 15px;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
         box-shadow: 0 4px 15px rgba(26, 61, 112, 0.2);
         text-align: center;
     }
     
     .logo-space {
-        width: 80px;
-        height: 80px;
+        width: 60px;
+        height: 60px;
         background-color: #ffffff;
         border-radius: 50%;
-        margin: 0 auto 15px auto;
+        margin: 0 auto 10px auto;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 40px;
+        font-size: 30px;
         box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     }
     
     .main-title {
         color: #ffffff !important;
-        font-size: 28px;
+        font-size: 22px;
         font-weight: bold;
         margin: 0;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        line-height: 1.3;
     }
     
     /* Contenedor principal */
     .main-container {
         max-width: 900px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 10px;
     }
     
     /* Botones de consultas rápidas */
@@ -753,25 +755,28 @@ def main():
         color: white !important;
         border: none;
         border-radius: 12px;
-        padding: 12px 20px;
+        padding: 14px 16px;
         font-weight: 600;
         transition: all 0.3s ease;
         box-shadow: 0 3px 8px rgba(19, 68, 146, 0.3);
         width: 100%;
         margin-bottom: 8px;
+        font-size: 14px;
+        text-align: center;
+        min-height: 48px;
     }
     
     .stButton > button:hover {
         background: linear-gradient(135deg, #dede3c 0%, #1a3d70 100%);
-        transform: translateY(-2px);
+        transform: translateY(-1px);
         box-shadow: 0 5px 15px rgba(222, 222, 60, 0.4);
     }
     
     /* Mensajes de chat */
     .chat-message {
-        padding: 15px;
+        padding: 12px;
         border-radius: 15px;
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         display: flex;
         align-items: flex-start;
         animation: fadeIn 0.3s ease-in;
@@ -784,7 +789,7 @@ def main():
     
     .user-message {
         background: linear-gradient(135deg, #dede3c 0%, #f5f5a3 100%);
-        margin-left: 15%;
+        margin-left: 10%;
         color: #1a3d70 !important;
         font-weight: 600;
         text-shadow: none;
@@ -798,7 +803,7 @@ def main():
     
     .bot-message {
         background: linear-gradient(135deg, #134492 0%, #1a3d70 100%);
-        margin-right: 15%;
+        margin-right: 10%;
         color: #ffffff !important;
         box-shadow: 0 3px 10px rgba(19, 68, 146, 0.3);
         border: 2px solid #dede3c;
@@ -812,7 +817,7 @@ def main():
     .stTextInput > div > div > input {
         border-radius: 25px;
         border: 2px solid #134492;
-        padding: 12px 20px;
+        padding: 14px 20px;
         background-color: #ffffff;
         color: #1a3d70 !important;
         font-size: 16px;
@@ -832,14 +837,13 @@ def main():
     
     /* Sección de consultas frecuentes */
     .frequent-queries {
-        background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95)), url('img/RKDY1435.JPG') no-repeat bottom right;
-        background-size: auto, 200px;
-        padding: 20px;
+        background: linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.95));
+        padding: 15px;
         border-radius: 15px;
-        margin: 20px 0;
+        margin: 15px 0;
         border: 3px solid #134492;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        max-width: 600px;
+        max-width: 100%;
         margin-left: auto;
         margin-right: auto;
     }
@@ -848,20 +852,34 @@ def main():
     .section-title {
         color: #1a3d70 !important;
         background-color: rgba(255, 255, 255, 0.95);
-        font-size: 24px;
+        font-size: 20px;
         font-weight: 900;
         margin-bottom: 15px;
         text-align: center;
-        padding: 8px 16px;
+        padding: 8px 12px;
         border-radius: 8px;
         display: inline-block;
         width: 100%;
         box-sizing: border-box;
     }
     
+    /* Chat input del chatbot */
+    .stChatInput > div {
+        background-color: transparent;
+    }
+    
+    .stChatInput input {
+        background-color: #ffffff !important;
+        color: #1a3d70 !important;
+        border: 2px solid #134492 !important;
+        border-radius: 25px !important;
+        padding: 14px 20px !important;
+        font-size: 16px !important;
+    }
+    
     /* Scrollbar personalizada */
     ::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
     }
     
     ::-webkit-scrollbar-track {
@@ -878,12 +896,6 @@ def main():
         background: linear-gradient(135deg, #134492, #1a3d70);
     }
     
-    /* Efectos hover para elementos interactivos */
-    .element-container:hover {
-        transform: scale(1.02);
-        transition: transform 0.2s ease;
-    }
-    
     /* Footer o información adicional */
     .info-footer {
         background: linear-gradient(135deg, #1a3d70 0%, #134492 100%);
@@ -894,39 +906,190 @@ def main():
         margin-top: 30px;
         box-shadow: 0 3px 10px rgba(26, 61, 112, 0.3);
     }
+    
+    /* MEDIA QUERIES PARA MÓVIL */
+    @media screen and (max-width: 768px) {
+        .stApp {
+            padding: 0 !important;
+        }
+        
+        .header-container {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+        }
+        
+        .main-title {
+            font-size: 18px;
+            line-height: 1.2;
+        }
+        
+        .logo-space {
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            padding: 6px 8px;
+        }
+        
+        .frequent-queries {
+            padding: 10px;
+            margin: 10px 5px;
+        }
+        
+        .stButton > button {
+            padding: 16px 12px;
+            font-size: 13px;
+            min-height: 50px;
+            margin-bottom: 6px;
+        }
+        
+        .chat-message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+        }
+        
+        .user-message {
+            margin-left: 5%;
+            font-size: 14px;
+        }
+        
+        .bot-message {
+            margin-right: 5%;
+            font-size: 14px;
+        }
+        
+        .stTextInput > div > div > input,
+        .stChatInput input {
+            padding: 16px 16px !important;
+            font-size: 16px !important;
+            border-radius: 20px !important;
+        }
+        
+        /* Columnas en móvil - hacer que los botones ocupen toda la fila */
+        .element-container .row-widget.stButton {
+            width: 100% !important;
+        }
+        
+        /* Ajustar el spacing entre elementos */
+        .element-container {
+            margin-bottom: 0.5rem !important;
+        }
+        
+        /* Hacer el chat input más accesible en móvil */
+        .stChatInput {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: #1e3a5f !important;
+            padding: 10px !important;
+            z-index: 999 !important;
+            border-top: 2px solid #134492;
+            box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Agregar padding al bottom del contenido para el input fijo */
+        .main.st-emotion-cache-uf99v8 {
+            padding-bottom: 80px !important;
+        }
+        
+        /* Mejorar la legibilidad de los mensajes en móvil */
+        .chat-message {
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+            hyphens: auto !important;
+        }
+        
+        .chat-message h1, .chat-message h2, .chat-message h3 {
+            font-size: clamp(16px, 4vw, 20px) !important;
+            margin: 10px 0 8px 0 !important;
+        }
+        
+        .chat-message p {
+            font-size: clamp(14px, 3.5vw, 16px) !important;
+            line-height: 1.5 !important;
+            margin: 8px 0 !important;
+        }
+        
+        .chat-message ul, .chat-message ol {
+            padding-left: 20px !important;
+            margin: 8px 0 !important;
+        }
+        
+        .chat-message li {
+            font-size: clamp(14px, 3.5vw, 16px) !important;
+            line-height: 1.4 !important;
+            margin: 4px 0 !important;
+        }
+        
+        /* Hacer hover menos agresivo en móvil */
+        .element-container:hover {
+            transform: none;
+        }
+        
+        .stButton > button:hover {
+            transform: none;
+        }
+    }
+    
+    /* MEDIA QUERIES PARA PANTALLAS MUY PEQUEÑAS */
+    @media screen and (max-width: 480px) {
+        .main-title {
+            font-size: 16px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+        }
+        
+        .stButton > button {
+            font-size: 12px;
+            padding: 14px 8px;
+            min-height: 48px;
+        }
+        
+        .chat-message {
+            padding: 8px;
+            font-size: 13px;
+        }
+        
+        .user-message,
+        .bot-message {
+            margin-left: 2%;
+            margin-right: 2%;
+        }
+        
+        .frequent-queries {
+            margin: 10px 2px;
+            padding: 8px;
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
     
-    # Header personalizado con logo
-    col_logo, col_title = st.columns([1, 4])
+    # Header personalizado con logo optimizado para móvil
+    st.markdown("""
+    <div class="header-container">
+        <h1 class="main-title">SwimmIA - Asistente Virtual del Club Montería Natación Master (MNM)</h1>
+    </div>
+    """, unsafe_allow_html=True)
     
-    with col_logo:
-        try:
-            st.image("logo/LOGO ORIGINAL.png", width=120)
-        except:
-            st.markdown("""
-            <div class="logo-space">🥽</div>
-            """, unsafe_allow_html=True)
-    
-    with col_title:
-        st.markdown("""
-        <div class="header-container">
-            <h1 class="main-title">SwimmIA - Asistente Virtual del Club Montería Natación Master (MNM)</h1>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # Mensaje de bienvenida
+    # Mensaje de bienvenida optimizado para móvil
     st.markdown("""
     <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
-                padding: 20px; 
+                padding: 15px; 
                 border-radius: 15px; 
-                margin: 20px auto; 
+                margin: 15px 5px; 
                 border-left: 5px solid #134492;
                 box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-                max-width: 800px;
                 text-align: center;">
-        <h3 style="color: #134492; margin-bottom: 15px; font-weight: bold;">¡Hola! Bienvenido al Club Montería Natación Master</h3>
-        <p style="color: #495057; font-size: 16px; margin: 0; line-height: 1.5;">
+        <h3 style="color: #134492; margin-bottom: 12px; font-weight: bold; font-size: clamp(18px, 4vw, 24px);">¡Hola! Bienvenido al Club Montería Natación Master</h3>
+        <p style="color: #495057; font-size: clamp(14px, 3.5vw, 16px); margin: 0; line-height: 1.4;">
             Soy tu asistente virtual <strong>SwimmIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. 
             <strong>¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
         </p>
@@ -950,7 +1113,15 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns(3)
+    # Layout adaptativo para móvil
+    if st.session_state.get("mobile_layout", True):
+        # Layout móvil: una sola columna
+        col1 = st.container()
+        col2 = st.container()
+        col3 = st.container()
+    else:
+        # Layout desktop: tres columnas
+        col1, col2, col3 = st.columns(3)
     
     with col1:
         if st.button("📅 Horarios del club"):
@@ -991,10 +1162,26 @@ def main():
             user_input = "¿Desde qué edad aceptan niños?"
             process_message(user_input)
     
-    # Mostrar historial de chat
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    # Mostrar historial de chat optimizado para móvil
+    chat_container = st.container()
+    with chat_container:
+        for message in st.session_state.messages:
+            if message["role"] == "user":
+                st.markdown(f"""
+                <div class="user-message chat-message">
+                    <div style="font-size: clamp(14px, 3.5vw, 16px); line-height: 1.4;">
+                        {message["content"]}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.markdown(f"""
+                <div class="bot-message chat-message">
+                    <div style="font-size: clamp(14px, 3.5vw, 16px); line-height: 1.4;">
+                        {message["content"]}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
     
     # Input del usuario
     if prompt := st.chat_input("Escribe tu pregunta aquí..."):
