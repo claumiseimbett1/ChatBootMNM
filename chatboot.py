@@ -1073,11 +1073,22 @@ def main():
     """, unsafe_allow_html=True)
     
     # Header personalizado con logo optimizado para móvil
-    st.markdown("""
-    <div class="header-container">
-        <h1 class="main-title">SwimmIA - Asistente Virtual del Club Montería Natación Master (MNM)</h1>
-    </div>
-    """, unsafe_allow_html=True)
+    col_logo, col_title = st.columns([1, 4])
+    
+    with col_logo:
+        try:
+            st.image("logo/LOGO ORIGINAL.png", width=120)
+        except:
+            st.markdown("""
+            <div class="logo-space">🥽</div>
+            """, unsafe_allow_html=True)
+    
+    with col_title:
+        st.markdown("""
+        <div class="header-container">
+            <h1 class="main-title">NatalIA - Asistente Virtual del Club Montería Natación Master (MNM)</h1>
+        </div>
+        """, unsafe_allow_html=True)
     
     # Mensaje de bienvenida optimizado para móvil
     st.markdown("""
@@ -1090,7 +1101,7 @@ def main():
                 text-align: center;">
         <h3 style="color: #134492; margin-bottom: 12px; font-weight: bold; font-size: clamp(18px, 4vw, 24px);">¡Hola! Bienvenido al Club Montería Natación Master</h3>
         <p style="color: #495057; font-size: clamp(14px, 3.5vw, 16px); margin: 0; line-height: 1.4;">
-            Soy tu asistente virtual <strong>SwimmIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. 
+            Soy tu asistente virtual <strong>NatalIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. Estamos en Villaolimpica - Monteria.
             <strong>¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
         </p>
     </div>

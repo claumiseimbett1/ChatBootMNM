@@ -1,9 +1,9 @@
-# requirements.txt
 streamlit>=1.32.0
 torch==2.6.0
 sentence-transformers>=2.2.2
 faiss-cpu>=1.7.4
-pypdf>=4.0.0
+PyPDF2
+pypdf
 langchain>=0.1.0,<0.2.0
 langchain-community>=0.0.20
 redis>=5.0.0
