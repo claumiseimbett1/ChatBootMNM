@@ -720,6 +720,21 @@ def main():
         color: inherit !important;
     }
     
+    /* Mejorar visibilidad de alertas de Streamlit */
+    .stAlert > div {
+        background-color: #e3f2fd !important;
+        color: #0d47a1 !important;
+        border: 2px solid #1976d2 !important;
+        border-radius: 15px !important;
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+    }
+    
+    .stAlert p, .stAlert div, .stAlert * {
+        color: #0d47a1 !important;
+        font-weight: 500 !important;
+    }
+    
     /* Header con logo */
     .header-container {
         background: linear-gradient(135deg, #1a3d70 0%, #134492 100%);
@@ -1117,35 +1132,16 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-    # Mensaje de bienvenida con máximo contraste
-    st.markdown("""
-    <div class="welcome-message" style="background-color: #ffffff !important; 
-                padding: 20px !important; 
-                border-radius: 15px !important; 
-                margin: 20px 10px !important; 
-                border: 4px solid #134492 !important;
-                box-shadow: 0 8px 20px rgba(19, 68, 146, 0.4) !important;
-                text-align: center !important;
-                display: block !important;
-                width: calc(100% - 20px) !important;
-                box-sizing: border-box !important;">
-        <h2 style="color: #134492 !important; 
-                   margin-bottom: 15px !important; 
-                   font-weight: 900 !important; 
-                   font-size: 24px !important;
-                   text-shadow: none !important;
-                   line-height: 1.3 !important;">¡Hola! Bienvenido al Club Montería Natación Master</h2>
-        <p style="color: #1a3d70 !important; 
-                  font-size: 16px !important; 
-                  margin: 0 !important; 
-                  line-height: 1.5 !important; 
-                  font-weight: 600 !important;
-                  text-shadow: none !important;">
-            Soy tu asistente virtual <strong style="color: #134492 !important;">NatalIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. Estamos en Villaolimpica - Monteria.<br><br>
-            <strong style="color: #134492 !important;">¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    # Mensaje de bienvenida usando componentes nativos de Streamlit
+    with st.container():
+        st.info("""
+        🏊‍♀️ **¡Hola! Bienvenido al Club Montería Natación Master**
+        
+        Soy tu asistente virtual **NatalIA** y te enseñaré todo sobre nuestro club y el proceso de inscripción. 
+        Estamos en Villaolimpica - Monteria.
+        
+        **¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?**
+        """)
     
     # Inicializar bot
     if "bot" not in st.session_state:
