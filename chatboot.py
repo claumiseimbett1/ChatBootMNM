@@ -695,6 +695,11 @@ def main():
         initial_sidebar_state="collapsed"
     )
     
+    # Meta viewport para móvil
+    st.markdown("""
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    """, unsafe_allow_html=True)
+    
     # CSS personalizado completo con optimización móvil
     st.markdown("""
     <style>
@@ -968,6 +973,19 @@ def main():
             padding: 16px 16px !important;
             font-size: 16px !important;
             border-radius: 20px !important;
+            -webkit-appearance: none !important;
+            appearance: none !important;
+            border: 2px solid #134492 !important;
+            background-color: #ffffff !important;
+            color: #1a3d70 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        .stChatInput input:focus {
+            outline: none !important;
+            border-color: #dede3c !important;
+            box-shadow: 0 0 10px rgba(222, 222, 60, 0.3) !important;
         }
         
         /* Columnas en móvil - hacer que los botones ocupen toda la fila */
@@ -982,20 +1000,26 @@ def main():
         
         /* Hacer el chat input más accesible en móvil */
         .stChatInput {
-            position: fixed !important;
+            position: sticky !important;
             bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
             background: #1e3a5f !important;
-            padding: 10px !important;
-            z-index: 999 !important;
+            padding: 10px 15px !important;
+            margin: 10px 0 0 0 !important;
             border-top: 2px solid #134492;
             box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
+            z-index: 100 !important;
         }
         
-        /* Agregar padding al bottom del contenido para el input fijo */
-        .main.st-emotion-cache-uf99v8 {
-            padding-bottom: 80px !important;
+        .stChatInput > div {
+            max-width: 100% !important;
+        }
+        
+        /* Mejorar compatibilidad con iOS Safari */
+        .stChatInput input {
+            -webkit-transform: translateZ(0) !important;
+            transform: translateZ(0) !important;
+            -webkit-backface-visibility: hidden !important;
+            backface-visibility: hidden !important;
         }
         
         /* Mejorar la legibilidad de los mensajes en móvil */
