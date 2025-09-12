@@ -943,6 +943,8 @@ def main():
         .frequent-queries {
             padding: 10px;
             margin: 10px 5px;
+            background: linear-gradient(rgba(222, 222, 60, 0.95), rgba(245, 245, 163, 0.95)) !important;
+            border: 3px solid #134492 !important;
         }
         
         .stButton > button {
@@ -950,6 +952,8 @@ def main():
             font-size: 13px;
             min-height: 50px;
             margin-bottom: 6px;
+            font-weight: 700 !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important;
         }
         
         .chat-message {
@@ -1110,17 +1114,17 @@ def main():
     
     # Mensaje de bienvenida optimizado para móvil
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+    <div style="background: linear-gradient(135deg, #dede3c 0%, #f5f5a3 100%); 
                 padding: 15px; 
                 border-radius: 15px; 
                 margin: 15px 5px; 
-                border-left: 5px solid #134492;
-                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+                border: 3px solid #134492;
+                box-shadow: 0 5px 15px rgba(19, 68, 146, 0.3);
                 text-align: center;">
-        <h3 style="color: #134492; margin-bottom: 12px; font-weight: bold; font-size: clamp(18px, 4vw, 24px);">¡Hola! Bienvenido al Club Montería Natación Master</h3>
-        <p style="color: #495057; font-size: clamp(14px, 3.5vw, 16px); margin: 0; line-height: 1.4;">
-            Soy tu asistente virtual <strong>NatalIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. Estamos en Villaolimpica - Monteria.
-            <strong>¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
+        <h3 style="color: #1a3d70; margin-bottom: 12px; font-weight: bold; font-size: clamp(18px, 4vw, 24px); text-shadow: 1px 1px 2px rgba(255,255,255,0.7);">¡Hola! Bienvenido al Club Montería Natación Master</h3>
+        <p style="color: #134492; font-size: clamp(14px, 3.5vw, 16px); margin: 0; line-height: 1.4; font-weight: 600;">
+            Soy tu asistente virtual <strong style="color: #1a3d70;">NatalIA</strong> y te enseñaré todo sobre nuestro club y el proceso de inscripción. Estamos en Villaolimpica - Monteria.
+            <br><strong style="color: #1a3d70;">¿Listo para sumergirte en tu proceso de aprendizaje o entrenamiento?</strong> 🏊‍♀️
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -1138,7 +1142,7 @@ def main():
     # Botones de consultas rápidas
     st.markdown("""
     <div class="frequent-queries">
-        <div class="section-title" style="color: #1a3d70 !important; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 10px; font-weight: bold; font-size: 24px;">Consultas Frecuentes</div>
+        <div class="section-title" style="color: #1a3d70 !important; background: linear-gradient(135deg, #dede3c 0%, #f5f5a3 100%); padding: 12px; border-radius: 10px; font-weight: bold; font-size: clamp(18px, 4vw, 24px); border: 2px solid #134492; box-shadow: 0 3px 8px rgba(19, 68, 146, 0.2);">Consultas Frecuentes</div>
     </div>
     """, unsafe_allow_html=True)
     
