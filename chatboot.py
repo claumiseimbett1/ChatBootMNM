@@ -970,22 +970,15 @@ def main():
         
         .stTextInput > div > div > input,
         .stChatInput input {
-            padding: 16px 16px !important;
+            padding: 12px 16px !important;
             font-size: 16px !important;
-            border-radius: 20px !important;
-            -webkit-appearance: none !important;
-            appearance: none !important;
+            border-radius: 25px !important;
             border: 2px solid #134492 !important;
             background-color: #ffffff !important;
             color: #1a3d70 !important;
             width: 100% !important;
             box-sizing: border-box !important;
-        }
-        
-        .stChatInput input:focus {
-            outline: none !important;
-            border-color: #dede3c !important;
-            box-shadow: 0 0 10px rgba(222, 222, 60, 0.3) !important;
+            min-height: 48px !important;
         }
         
         /* Columnas en móvil - hacer que los botones ocupen toda la fila */
@@ -998,28 +991,16 @@ def main():
             margin-bottom: 0.5rem !important;
         }
         
-        /* Hacer el chat input más accesible en móvil */
+        /* Chat input simplificado para móvil */
         .stChatInput {
-            position: sticky !important;
-            bottom: 0 !important;
             background: #1e3a5f !important;
-            padding: 10px 15px !important;
-            margin: 10px 0 0 0 !important;
-            border-top: 2px solid #134492;
-            box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.2);
-            z-index: 100 !important;
+            padding: 10px !important;
+            margin: 10px 0 !important;
+            border-radius: 15px !important;
         }
         
         .stChatInput > div {
-            max-width: 100% !important;
-        }
-        
-        /* Mejorar compatibilidad con iOS Safari */
-        .stChatInput input {
-            -webkit-transform: translateZ(0) !important;
-            transform: translateZ(0) !important;
-            -webkit-backface-visibility: hidden !important;
-            backface-visibility: hidden !important;
+            width: 100% !important;
         }
         
         /* Mejorar la legibilidad de los mensajes en móvil */
@@ -1091,6 +1072,19 @@ def main():
         .frequent-queries {
             margin: 10px 2px;
             padding: 8px;
+        }
+        
+        /* Asegurar funcionalidad del chat input */
+        .stChatInput {
+            position: relative !important;
+            z-index: 1 !important;
+        }
+        
+        .stChatInput input {
+            -webkit-user-select: text !important;
+            user-select: text !important;
+            -webkit-touch-callout: default !important;
+            touch-action: manipulation !important;
         }
     }
     </style>
